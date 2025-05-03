@@ -31,6 +31,7 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend', 'dist', 'index.html'));
   });
+  console.log('In condition');
 }
 
 server.listen(PORT, () => {
