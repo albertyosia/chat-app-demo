@@ -11,9 +11,7 @@ export const signup = async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: 'Password must be at least 6 characters' });
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
     const user = await User.findOne({ email });
@@ -98,14 +96,26 @@ export const updateProfile = async (req, res) => {
     }
 
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true });
     res.status(200).json(updatedUser);
   } catch (error) {
     console.log('Error in update profile: ', error.message);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const updateProfileName = async (req, res) => {
+  try {
+    const { fullName } = req.body;
+    const userId = req.user._id;
+
+    if (!fullName) {
+      return res.status(400).json({ message: 'Full name is required' });
+    }
+    const updatedUser = await User.findByIdAndUpdate(userId, { fullName }, { new: true });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log('Error in updateProfileName: ', error.message);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };

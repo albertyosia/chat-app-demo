@@ -3,8 +3,11 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Camera, Mail, User } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const { authUser, isUpdatingProfile, updateProfile, updateProfileName } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const [updateUser, setUpdateUser] = useState(authUser);
+  const [isNameChange, setIsNameChange] = useState(false);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -17,6 +20,17 @@ const ProfilePage = () => {
       await updateProfile({ profilePic: base64Image });
     };
   };
+
+  const handleChangeName = (e) => {
+    setIsNameChange(true);
+    setUpdateUser({ ...updateUser, fullName: e.target.value });
+  };
+
+  const updateName = async () => {
+    await updateProfileName({ fullName: updateUser.fullName });
+    setIsNameChange(false);
+  };
+
   return (
     <div className='h-screen pt-20'>
       <div className='max-w-2xl mx-auto p-4 py-8'>
@@ -41,9 +55,7 @@ const ProfilePage = () => {
                   bg-base-content hover:scale-105
                   p-2 rounded-full cursor-pointer 
                   transition-all duration-200
-                  ${
-                    isUpdatingProfile ? 'animate-pulse pointer-events-none' : ''
-                  }
+                  ${isUpdatingProfile ? 'animate-pulse pointer-events-none' : ''}
                 `}
               >
                 <Camera className='w-5 h-5 text-base-200' />
@@ -58,9 +70,7 @@ const ProfilePage = () => {
               </label>
             </div>
             <p className='text-sm text-zinc-400'>
-              {isUpdatingProfile
-                ? 'Uploading...'
-                : 'Click the camera icon to update your photo'}
+              {isUpdatingProfile ? 'Uploading...' : 'Click the camera icon to update your photo'}
             </p>
           </div>
 
@@ -71,9 +81,18 @@ const ProfilePage = () => {
                 <User className='w-4 h-4' />
                 Full Name
               </div>
-              <p className='px-4 py-2.5 bg-base-200 rounded-lg border'>
-                {authUser?.fullName}
-              </p>
+              <input
+                className='px-4 py-2.5 bg-base-200 rounded-lg border w-full'
+                value={updateUser.fullName}
+                onChange={handleChangeName}
+              />
+              {isNameChange ? (
+                <button type='submit' onClick={() => updateName()} className='btn btn-primary'>
+                  Save
+                </button>
+              ) : (
+                <></>
+              )}
             </div>
 
             <div className='space-y-1.5'>
@@ -81,9 +100,7 @@ const ProfilePage = () => {
                 <Mail className='w-4 h-4' />
                 Email Address
               </div>
-              <p className='px-4 py-2.5 bg-base-200 rounded-lg border'>
-                {authUser?.email}
-              </p>
+              <p className='px-4 py-2.5 bg-base-200 rounded-lg border'>{authUser?.email}</p>
             </div>
           </div>
 
